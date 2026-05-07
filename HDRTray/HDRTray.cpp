@@ -192,6 +192,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_AUTOSTART:
                 notify_icon->ToggleAutostartEnabled();
                 break;
+            case IDM_SDRPW_80:
+                notify_icon->SetSDRWhiteLevel(80);
+                break;
+            case IDM_SDRPW_203:
+                notify_icon->SetSDRWhiteLevel(203);
+                break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;

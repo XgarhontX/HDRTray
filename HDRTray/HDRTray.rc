@@ -29,6 +29,10 @@ BEGIN
     BEGIN
         MENUITEM "Enable &HDR",             IDM_ENABLE_HDR
         MENUITEM "&Start when logging in",  IDM_AUTOSTART
+        MENUITEM SEPARATOR
+        MENUITEM "&SDR 80",                 IDM_SDRPW_80
+        MENUITEM "&SDR 203",                IDM_SDRPW_203
+        MENUITEM SEPARATOR
         MENUITEM "&Quit",                   IDM_EXIT
     END
 END
@@ -70,6 +74,10 @@ BEGIN
     BEGIN
         MENUITEM "Ativar o &HDR",           IDM_ENABLE_HDR
         MENUITEM "&Iniciar ao fazer login", IDM_AUTOSTART
+        MENUITEM SEPARATOR
+        MENUITEM "&SDR 80",                 IDM_SDRPW_80
+        MENUITEM "&SDR 203",                IDM_SDRPW_203
+        MENUITEM SEPARATOR
         MENUITEM "&Sair",                   IDM_EXIT
     END
 END
