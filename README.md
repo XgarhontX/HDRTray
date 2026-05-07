@@ -1,3 +1,11 @@
+XgarhontX Edits
+=======
+- New Buttons: Windows Settings "HDR/SDR brightness balance"
+  - 80, 203, 480 nits.
+- New Buttons: Integration with [dwm_eotf](https://github.com/ledoge/dwm_eotf)
+  - Place dwm_eotf.exe next to this.
+  - sRGB, 2.2, 2.4.
+-----
 HDRTray
 =======
 Windows Notification Area icon to show and change HDR status.
