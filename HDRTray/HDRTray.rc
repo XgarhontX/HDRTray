@@ -60,7 +60,7 @@ BEGIN
    IDS_EOTF_NOTFOUND_TITLE        "dwm_eotf.exe Not Found"
    IDS_EOTF_NOTFOUND_CONTENT      "Changing the EOTF behavior requires dwm_eotf.exe placed next to this execuable.\n\n(Scans, patch, and restart dwm.exe to safely/temporarily memory hack gamma sRGB decode shader to 2.2 or more for SDR content on HDR scRGB output.)"
    IDS_EOTF_WARN_TITLE            "Windows Instability False Positive"
-   IDS_EOTF_WARN_CONTENT          "Running too many times trigger GPU driver uninstalling because Windows thinks it's instability.\n\nShould be reversible by reinstall from disk, just annoying."
+   IDS_EOTF_WARN_CONTENT          "Running this too many times will trigger GPU driver uninstall since Windows thinks there is instability.\n\nIt should be reversible by reinstall from disk, but it's annoying."
 END
 
 
