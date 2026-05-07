@@ -31,6 +31,7 @@ struct Display
 Status GetWindowsHDRStatus();
 std::optional<Status> SetWindowsHDRStatus(bool enable);
 std::optional<Status> ToggleHDRStatus();
+bool SetSDRWhiteLevel(float nits);
 /// Get information for all displays
 std::vector<Display> GetDisplays();
 

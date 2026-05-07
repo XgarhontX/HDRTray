@@ -371,3 +371,139 @@ bool NotifyIcon::IsAutostartEnabled() const
 
     return has_auto_start;
 }
+
+void NotifyIcon::SetSDRWhiteLevel(float nits)
+{
+    hdr::SetSDRWhiteLevel(nits);
+}
+
+bool NotifyIcon::SetEOTF(float eotf)
+{
+    //check for dwm_eotf.exe next to this
+    wchar_t* exe_path = nullptr;
+    _get_wpgmptr(&exe_path);
+
+    std::wstring dwm_eotf_path(exe_path);
+    auto last_sep = dwm_eotf_path.find_last_of(L"\\/");
+    {
+        if (last_sep != std::wstring::npos) dwm_eotf_path.resize(last_sep + 1);
+        dwm_eotf_path += L"dwm_eotf.exe";
+    }
+
+    //failed
+    if (GetFileAttributesW(dwm_eotf_path.c_str()) == INVALID_FILE_ATTRIBUTES)
+    {
+        //give notice that dwm_eotf.exe is required, prompt for download
+        static const TASKDIALOG_BUTTON buttons[] = {
+            { IDOK,     L"GitHub Releases" },
+            { IDCANCEL, L"Ok"   },
+        };
+        TASKDIALOGCONFIG tdc = { sizeof(tdc) };
+        tdc.hwndParent         = notify_template.hWnd;
+
+        wchar_t pszWindowTitle[16];
+        l10n::LoadString(IDS_APP_TITLE, pszWindowTitle);
+        tdc.pszWindowTitle     = pszWindowTitle;
+
+        wchar_t pszMainInstruction[32];
+        l10n::LoadString(IDS_EOTF_NOTFOUND_TITLE, pszMainInstruction);
+        tdc.pszMainInstruction = pszMainInstruction;
+
+        wchar_t pszContent[256];
+        l10n::LoadString(IDS_EOTF_NOTFOUND_CONTENT, pszContent);
+        tdc.pszContent         = pszContent;
+
+        tdc.pszMainIcon        = TD_INFORMATION_ICON;
+        tdc.pButtons           = buttons;
+        tdc.cButtons           = ARRAYSIZE(buttons);
+        tdc.nDefaultButton     = IDCANCEL;
+
+        int button_pressed = IDCANCEL;
+        TaskDialogIndirect(&tdc, &button_pressed, nullptr, nullptr);
+        if (button_pressed == IDOK)
+            ShellExecuteW(nullptr, L"open", L"https://github.com/ledoge/dwm_eotf/releases",
+                          nullptr, nullptr, SW_SHOWNORMAL);
+
+        return false;
+    }
+
+    //warning about running too many times, dismissed by creating empty file
+    std::wstring dwm_eotf_warn_dismiss_path(exe_path); //reuse last_sep
+    {
+        if (last_sep != std::wstring::npos) dwm_eotf_warn_dismiss_path.resize(last_sep + 1);
+        dwm_eotf_warn_dismiss_path += L"dwm_eotf_warn_dismiss";
+    }
+
+    if (GetFileAttributesW(dwm_eotf_warn_dismiss_path.c_str()) == INVALID_FILE_ATTRIBUTES){
+        //dialog
+        TASKDIALOGCONFIG tdc = { sizeof(tdc) };
+        tdc.hwndParent         = notify_template.hWnd;
+        
+        wchar_t pszWindowTitle[16];
+        l10n::LoadString(IDS_APP_TITLE, pszWindowTitle);
+        tdc.pszWindowTitle     = pszWindowTitle;
+
+        wchar_t pszMainInstruction[32];
+        l10n::LoadString(IDS_EOTF_WARN_TITLE, pszMainInstruction);
+        tdc.pszMainInstruction = pszMainInstruction;
+
+        wchar_t pszContent[256];
+        l10n::LoadString(IDS_EOTF_WARN_CONTENT, pszContent);
+        tdc.pszContent         = pszContent;
+
+        tdc.pszMainIcon        = TD_WARNING_ICON;
+        tdc.dwCommonButtons    = TDCBF_OK_BUTTON;
+        TaskDialogIndirect(&tdc, nullptr, nullptr, nullptr);
+
+        //create file
+        HANDLE hFile = CreateFileW(dwm_eotf_warn_dismiss_path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (hFile != INVALID_HANDLE_VALUE) CloseHandle(hFile);
+    }
+
+    //branch by arg
+    if (eotf > 0) {
+        //spawn new process with arg
+        wchar_t eotf_str[32];
+        swprintf_s(eotf_str, L"%g", eotf);
+
+        SHELLEXECUTEINFOW sei = { sizeof(sei) };
+        sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
+        sei.hwnd         = notify_template.hWnd;
+        sei.lpVerb       = L"runas";
+        sei.lpFile       = dwm_eotf_path.c_str();
+        sei.lpParameters = eotf_str;
+        sei.nShow        = SW_SHOWNORMAL;
+
+        //failed, pc must be messed up if this reaches
+        if (!ShellExecuteExW(&sei))
+            return false;
+
+        //wait for user to acknowledge, then close
+        if (sei.hProcess)
+        {
+            WaitForSingleObject(sei.hProcess, INFINITE);
+            CloseHandle(sei.hProcess);
+        }
+    } else {
+        //kill dwm.exe to restart & reset memory
+        wchar_t system32_path[MAX_PATH];
+        GetSystemDirectoryW(system32_path, MAX_PATH);
+        std::wstring taskkill_path = std::wstring(system32_path) + L"\\taskkill.exe";
+
+        SHELLEXECUTEINFOW sei = { sizeof(sei) };
+        sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
+        sei.hwnd         = notify_template.hWnd;
+        sei.lpVerb       = L"runas";
+        sei.lpFile       = taskkill_path.c_str();
+        sei.lpParameters = L"/f /im dwm.exe";
+        sei.nShow        = SW_HIDE;
+
+        //failed, pc must be messed up if this reaches
+        if (!ShellExecuteExW(&sei)) return false;
+
+        //close
+        if (sei.hProcess) CloseHandle(sei.hProcess);
+    }
+
+    return true;
+}

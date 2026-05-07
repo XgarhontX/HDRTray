@@ -154,6 +154,34 @@ std::optional<Status> ToggleHDRStatus()
     return SetWindowsHDRStatus(status == Status::Off ? true : false);
 }
 
+//https://github.com/Filoppi/Luma-Framework/blob/main/Source/Core/utils/display.hpp
+#define DISPLAYCONFIG_DEVICE_INFO_SET_SDR_WHITE_LEVEL (DISPLAYCONFIG_DEVICE_INFO_TYPE)0xFFFFFFEE
+typedef struct __declspec(align(4)) _DISPLAYCONFIG_SET_SDR_WHITE_LEVEL
+{
+	DISPLAYCONFIG_DEVICE_INFO_HEADER header;
+	ULONG                            SDRWhiteLevel;
+	BYTE                             finalValue;
+} DISPLAYCONFIG_SET_SDR_WHITE_LEVEL;
+
+bool SetSDRWhiteLevel(float nits)
+{
+    bool success = false;
+    ForEachDisplay([&](const DISPLAYCONFIG_MODE_INFO& mode) {
+        DISPLAYCONFIG_SET_SDR_WHITE_LEVEL setSdrWhiteLevel{};
+        setSdrWhiteLevel.header.type = DISPLAYCONFIG_DEVICE_INFO_SET_SDR_WHITE_LEVEL;
+        setSdrWhiteLevel.header.size = sizeof(DISPLAYCONFIG_SET_SDR_WHITE_LEVEL);
+        setSdrWhiteLevel.header.adapterId = mode.adapterId;
+        setSdrWhiteLevel.header.id = mode.id;
+        setSdrWhiteLevel.SDRWhiteLevel = static_cast<ULONG>((nits * 1000.0f) / 80.0f);
+        setSdrWhiteLevel.finalValue = TRUE;
+        if (DisplayConfigSetDeviceInfo(&setSdrWhiteLevel.header) == ERROR_SUCCESS)
+            success = true;
+    });
+    return success;
+}
+
+//TODO: GetSDRWhiteLevel if needed
+
 static const wchar_t* GetFallbackDisplayName(const DISPLAYCONFIG_MODE_INFO& mode)
 {
     DISPLAYCONFIG_TARGET_BASE_TYPE target_base = {};

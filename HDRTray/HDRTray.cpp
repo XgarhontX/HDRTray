@@ -189,6 +189,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_ENABLE_HDR:
                 notify_icon->ToggleHDR();
                 break;
+            case IDM_SDRWL_80:
+                notify_icon->SetSDRWhiteLevel(80);
+                break;
+            case IDM_SDRWL_203:
+                notify_icon->SetSDRWhiteLevel(203);
+                break;
+            case IDM_SDRWL_480:
+                notify_icon->SetSDRWhiteLevel(480);
+                break;
+            case IDM_EOTF_SRGB:
+                notify_icon->SetEOTF(0);
+                break;
+            case IDM_EOTF_22:
+                notify_icon->SetEOTF(2.2);
+                break;
+            case IDM_EOTF_24:
+                notify_icon->SetEOTF(2.4);
+                break;
             case IDM_AUTOSTART:
                 notify_icon->ToggleAutostartEnabled();
                 break;

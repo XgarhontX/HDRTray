@@ -58,6 +58,9 @@ public:
 
     void ToggleAutostartEnabled();
     void ToggleHDR();
+    
+    void SetSDRWhiteLevel(float nits);
+    bool SetEOTF(float eotf);
 
 protected:
     void PopupIconMenu(HWND hWnd, POINT pos);

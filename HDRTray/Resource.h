@@ -22,10 +22,22 @@
 #define IDS_HDR_OFF             104
 #define IDS_WINDOWS_TOO_OLD     105
 #define IDS_TOGGLE_HDR_ERROR    106
+#define IDS_EOTF_OK             107
+#define IDS_EOTF_GITHUB_REL     108
+#define IDS_EOTF_NOTFOUND_TITLE 109
+#define IDS_EOTF_NOTFOUND_CONTENT 110
+#define IDS_EOTF_WARN_TITLE     111
+#define IDS_EOTF_WARN_CONTENT   112
 
 #define IDM_EXIT                101
 #define IDM_AUTOSTART           102
 #define IDM_ENABLE_HDR          103
+#define IDM_SDRWL_80            104
+#define IDM_SDRWL_203           105
+#define IDM_SDRWL_480           106
+#define IDM_EOTF_SRGB           107
+#define IDM_EOTF_22             108
+#define IDM_EOTF_24             109
 
 #define IDI_APP                 1
 #define IDI_HDR_OFF_DARKMODE    101
